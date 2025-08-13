@@ -3,295 +3,338 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>P2P Energy Trading Platform</title>
-    
-    <!-- TailwindCSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    
-    <!-- SweetAlert2 -->
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    
-    <!-- Ethers.js -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.7.1/ethers.umd.min.js"></script>
-    
-    <!-- Font Awesome for icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
-    <style>
-        .gradient-bg {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        }
-        
-        .card-shadow {
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-        }
-        
-        .pulse-green {
-            animation: pulse-green 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-        }
-        
-        @keyframes pulse-green {
-            0%, 100% {
-                opacity: 1;
-            }
-            50% {
-                opacity: .5;
-            }
-        }
-        
-        .loading-spinner {
-            border: 4px solid #f3f3f3;
-            border-top: 4px solid #3498db;
-            border-radius: 50%;
-            width: 20px;
-            height: 20px;
-            animation: spin 2s linear infinite;
-            display: inline-block;
-        }
-        
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-    </style>
+    <title>Shakti Exchange</title>
+    <link rel="icon" type="image/x-icon" href="/assets/energy-saving.png">
+    <link rel="stylesheet" href="style_landing.css">
 </head>
-<body class="bg-gray-50 min-h-screen">
-    <!-- Navigation -->
-    <nav class="gradient-bg shadow-lg">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between h-16">
-                <div class="flex items-center">
-                    <i class="fas fa-bolt text-white text-2xl mr-3"></i>
-                    <h1 class="text-white text-xl font-bold">P2P Energy Trading</h1>
-                </div>
-                <div class="flex items-center space-x-4">
-                    <div id="networkStatus" class="hidden bg-red-500 text-white px-3 py-1 rounded-full text-sm">
-                        Wrong Network
-                    </div>
-                    <div id="connectionStatus" class="bg-red-500 text-white px-3 py-1 rounded-full text-sm">
-                        Not Connected
-                    </div>
-                    <button id="connectWallet" class="bg-white text-blue-600 px-4 py-2 rounded-lg font-medium hover:bg-gray-100 transition-colors">
-                        Connect Wallet
-                    </button>
-                </div>
+<body>
+    <!-- Header -->
+    <header class="header" id="header">
+        <nav class="nav container">
+            <div class="nav__brand">
+                <span class="nav__logo">Shakti Exchange</span>
             </div>
-        </div>
-    </nav>
-
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <!-- Loading Overlay -->
-        <div id="loadingOverlay" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
-            <div class="bg-white p-6 rounded-lg flex items-center space-x-4">
-                <div class="loading-spinner"></div>
-                <span class="text-gray-700">Processing transaction...</span>
+            <div class="nav__menu" id="nav-menu">
+                <ul class="nav__list">
+                    <li class="nav__item">
+                        <a href="#home" class="nav__link">Home</a>
+                    </li>
+                    <li class="nav__item">
+                        <a href="#features" class="nav__link">Features</a>
+                    </li>
+                    <li class="nav__item">
+                        <a href="#how-it-works" class="nav__link">How It Works</a>
+                    </li>
+                    <li class="nav__item">
+                        <a href="#faq" class="nav__link">FAQ</a>
+                    </li>
+                    <li class="nav__item">
+                        <a href="#contact" class="nav__link">Contact</a>
+                    </li>
+                </ul>
+                <div class="nav__close" id="nav-close">✕</div>
             </div>
-        </div>
+            <div class="nav__actions">
+                <a href="dashboard.html">  <button class="btn btn--primary nav__cta">Start Trading</button></a>
+                <div class="nav__toggle" id="nav-toggle">☰</div>
+            </div>
+        </nav>
+    </header>
 
-        <!-- Wallet Info Section -->
-        <div id="walletInfo" class="hidden mb-8">
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
-                <div class="bg-white rounded-lg card-shadow p-6">
-                    <div class="flex items-center justify-between">
-                        <div>
-                            <p class="text-sm font-medium text-gray-600">Wallet Address</p>
-                            <p id="walletAddress" class="text-lg font-semibold text-gray-900 truncate"></p>
+    <main>
+        <!-- Hero Section -->
+        <section class="hero" id="home">
+            <div class="container">
+                <div class="hero__content">
+                    <div class="hero__text">
+                        <h1 class="hero__title">Trade Energy Directly With Your Neighbors</h1>
+                        <p class="hero__subtitle">Join the decentralized energy revolution. Buy and sell renewable energy using blockchain technology, reduce costs, and support your local community.</p>
+                        <div class="hero__actions">
+                         <a href="dashboard.html">   <button class="btn btn--primary btn--lg" >Start Trading Now</button></a>
+                            <!-- <button class="btn btn--outline btn--lg">Watch Demo</button> -->
                         </div>
-                        <i class="fas fa-wallet text-blue-500 text-2xl"></i>
                     </div>
-                </div>
-                
-                <div class="bg-white rounded-lg card-shadow p-6">
-                    <div class="flex items-center justify-between">
-                        <div>
-                            <p class="text-sm font-medium text-gray-600">ETH Balance</p>
-                            <p id="ethBalance" class="text-lg font-semibold text-gray-900">0.00</p>
+                    <div class="hero__visual">
+                        <div class="energy-grid">
+                            <div class="grid-node active"></div>
+                            <div class="grid-node"></div>
+                            <div class="grid-node active"></div>
+                            <div class="grid-node"></div>
+                            <div class="grid-node active"></div>
+                            <div class="grid-node"></div>
+                            <div class="energy-flow"></div>
                         </div>
-                        <i class="fab fa-ethereum text-purple-500 text-2xl"></i>
-                    </div>
-                </div>
-                
-                <div class="bg-white rounded-lg card-shadow p-6">
-                    <div class="flex items-center justify-between">
-                        <div>
-                            <p class="text-sm font-medium text-gray-600">Energy Balance</p>
-                            <p id="energyBalance" class="text-lg font-semibold text-green-600">0 kWh</p>
-                        </div>
-                        <i class="fas fa-battery-full text-green-500 text-2xl"></i>
-                    </div>
-                </div>
-                
-                <div class="bg-white rounded-lg card-shadow p-6">
-                    <div class="flex items-center justify-between">
-                        <div>
-                            <p class="text-sm font-medium text-gray-600">Pending Earnings</p>
-                            <p id="pendingEarnings" class="text-lg font-semibold text-yellow-600">0.00 ETH</p>
-                            <button id="withdrawBtn" class="mt-2 bg-yellow-500 text-white px-3 py-1 rounded text-sm hover:bg-yellow-600 transition-colors">
-                                Withdraw
-                            </button>
-                        </div>
-                        <i class="fas fa-coins text-yellow-500 text-2xl"></i>
                     </div>
                 </div>
             </div>
-        </div>
-
-        <!-- Registration Section -->
-        <div id="registrationSection" class="hidden mb-8">
-            <div class="bg-white rounded-lg card-shadow p-6">
-                <h2 class="text-2xl font-bold text-gray-900 mb-4">
-                    <i class="fas fa-user-plus mr-2"></i>Register Your Role
-                </h2>
-                <p class="text-gray-600 mb-6">Choose your role in the energy trading platform:</p>
-                <div class="flex space-x-4">
-                    <button id="registerProducer" class="bg-green-500 text-white px-6 py-3 rounded-lg hover:bg-green-600 transition-colors flex items-center">
-                        <i class="fas fa-solar-panel mr-2"></i>Register as Producer
-                    </button>
-                    <button id="registerConsumer" class="bg-blue-500 text-white px-6 py-3 rounded-lg hover:bg-blue-600 transition-colors flex items-center">
-                        <i class="fas fa-home mr-2"></i>Register as Consumer
-                    </button>
-                </div>
+            <div class="hero__particles">
+                <div class="particle"></div>
+                <div class="particle"></div>
+                <div class="particle"></div>
+                <div class="particle"></div>
+                <div class="particle"></div>
             </div>
-        </div>
+        </section>
 
-        <!-- Contract Status -->
-        <div id="contractStatus" class="hidden mb-8">
-            <div class="bg-white rounded-lg card-shadow p-4">
-                <div class="flex items-center justify-between">
-                    <div class="flex items-center">
-                        <div id="contractStatusIcon" class="w-3 h-3 rounded-full bg-green-500 mr-3 pulse-green"></div>
-                        <span class="text-sm font-medium text-gray-700">Contract Status: </span>
-                        <span id="contractStatusText" class="text-sm font-medium text-green-600 ml-1">Active</span>
+        <!-- Stats Section -->
+        <section class="stats">
+            <div class="container">
+                <div class="stats__grid">
+                    <div class="stat-item">
+                        <span class="stat-value" data-target="25000">0</span>
+                        <span class="stat-label">Active Users</span>
                     </div>
-                    <div id="ownerControls" class="hidden">
-                        <button id="togglePauseBtn" class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 transition-colors text-sm">
-                            Pause Contract
-                        </button>
+                    <div class="stat-item">
+                        <span class="stat-value" data-target="1500">0</span>
+                        <span class="stat-label">Energy Traded (MWh)</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-value" data-target="28">0</span>
+                        <span class="stat-label">% Average Savings</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-value" data-target="500">0</span>
+                        <span class="stat-label">CO2 Reduced (tons)</span>
                     </div>
                 </div>
             </div>
-        </div>
+        </section>
 
-        <!-- Main Content Tabs -->
-        <div class="mb-8">
-            <div class="border-b border-gray-200">
-                <nav class="-mb-px flex space-x-8">
-                    <button id="marketplaceTab" class="tab-button py-2 px-1 border-b-2 border-blue-500 font-medium text-sm text-blue-600">
-                        <i class="fas fa-store mr-2"></i>Marketplace
-                    </button>
-                    <button id="sellTab" class="tab-button py-2 px-1 border-b-2 border-transparent font-medium text-sm text-gray-500 hover:text-gray-700 hover:border-gray-300">
-                        <i class="fas fa-plus-circle mr-2"></i>Sell Energy
-                    </button>
-                    <button id="myListingsTab" class="tab-button py-2 px-1 border-b-2 border-transparent font-medium text-sm text-gray-500 hover:text-gray-700 hover:border-gray-300">
-                        <i class="fas fa-list mr-2"></i>My Listings
-                    </button>
-                    <button id="historyTab" class="tab-button py-2 px-1 border-b-2 border-transparent font-medium text-sm text-gray-500 hover:text-gray-700 hover:border-gray-300">
-                        <i class="fas fa-history mr-2"></i>History
-                    </button>
-                </nav>
+        <!-- Features Section -->
+        <section class="features" id="features">
+            <div class="container">
+                <div class="section-header">
+                    <h2 class="section-title">Platform Features</h2>
+                    <p class="section-subtitle">Everything you need for seamless peer-to-peer energy trading</p>
+                </div>
+                <div class="features__grid">
+                    <div class="feature-card">
+                        <div class="feature-icon">🔐</div>
+                        <h3 class="feature-title">Blockchain Security</h3>
+                        <p class="feature-description">Secure, transparent transactions using smart contracts and distributed ledger technology</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">⚡</div>
+                        <h3 class="feature-title">Real-Time Trading</h3>
+                        <p class="feature-description">Buy and sell energy instantly at current market prices with automated matching</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">🏘️</div>
+                        <h3 class="feature-title">Community Network</h3>
+                        <p class="feature-description">Trade energy directly with neighbors, local businesses, and community members</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">📊</div>
+                        <h3 class="feature-title">Smart Analytics</h3>
+                        <p class="feature-description">Monitor energy production, consumption patterns, and trading performance</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">📱</div>
+                        <h3 class="feature-title">Mobile App</h3>
+                        <p class="feature-description">Manage energy trades, view analytics, and control settings from anywhere</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">🌱</div>
+                        <h3 class="feature-title">Green Energy Focus</h3>
+                        <p class="feature-description">Support renewable energy adoption and reduce carbon footprint locally</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">💳</div>
+                        <h3 class="feature-title">Automated Billing</h3>
+                        <p class="feature-description">Seamless payment processing, invoicing, and settlement through smart contracts</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">🔋</div>
+                        <h3 class="feature-title">Energy Storage Integration</h3>
+                        <p class="feature-description">Connect battery systems and storage solutions for optimal energy management</p>
+                    </div>
+                </div>
             </div>
-        </div>
+        </section>
 
-        <!-- Tab Contents -->
+        <!-- How It Works Section -->
+        <section class="how-it-works" id="how-it-works">
+            <div class="container">
+                <div class="section-header">
+                    <h2 class="section-title">How It Works</h2>
+                    <p class="section-subtitle">Start trading energy in three simple steps</p>
+                </div>
+                <div class="steps">
+                    <div class="step">
+                        <div class="step-number">1</div>
+                        <h3 class="step-title">Connect Your System</h3>
+                        <p class="step-description">Link your solar panels, smart meters, or energy storage devices to our platform</p>
+                    </div>
+                    <div class="step-connector"></div>
+                    <div class="step">
+                        <div class="step-number">2</div>
+                        <h3 class="step-title">Set Your Preferences</h3>
+                        <p class="step-description">Choose buying/selling preferences, set price limits, and define trading hours</p>
+                    </div>
+                    <div class="step-connector"></div>
+                    <div class="step">
+                        <div class="step-number">3</div>
+                        <h3 class="step-title">Start Trading</h3>
+                        <p class="step-description">Our AI automatically matches you with buyers/sellers and executes trades</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Benefits Section -->
+        <section class="benefits">
+            <div class="container">
+                <div class="section-header">
+                    <h2 class="section-title">Why Choose P2P Energy Trading?</h2>
+                    <p class="section-subtitle">Transform how you consume and produce energy</p>
+                </div>
+                <div class="benefits__grid">
+                    <div class="benefit-card">
+                        <div class="benefit-stat">30%</div>
+                        <h3 class="benefit-title">Reduce Energy Costs</h3>
+                        <p class="benefit-description">Save up to 30% on electricity bills through competitive P2P pricing</p>
+                    </div>
+                    <div class="benefit-card">
+                        <div class="benefit-stat">₹200+</div>
+                        <h3 class="benefit-title">Earn from Excess Energy</h3>
+                        <p class="benefit-description">Monetize surplus renewable energy production at fair market rates</p>
+                    </div>
+                    <div class="benefit-card">
+                        <div class="benefit-stat">85%</div>
+                        <h3 class="benefit-title">Support Clean Energy</h3>
+                        <p class="benefit-description">Promote local renewable energy adoption in your community</p>
+                    </div>
+                    <div class="benefit-card">
+                        <div class="benefit-stat">40%</div>
+                        <h3 class="benefit-title">Grid Independence</h3>
+                        <p class="benefit-description">Reduce dependence on traditional utility companies and centralized power</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Pricing Section -->
         
-        <!-- Marketplace Tab -->
-        <div id="marketplaceContent" class="tab-content">
-            <div class="bg-white rounded-lg card-shadow p-6">
-                <div class="flex justify-between items-center mb-6">
-                    <h2 class="text-2xl font-bold text-gray-900">
-                        <i class="fas fa-store mr-2"></i>Energy Marketplace
-                    </h2>
-                    <button id="refreshMarketplace" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition-colors">
-                        <i class="fas fa-sync-alt mr-2"></i>Refresh
-                    </button>
+        
+        <!-- FAQ Section -->
+        <section class="faq" id="faq">
+            <div class="container">
+                <div class="section-header">
+                    <h2 class="section-title">Frequently Asked Questions</h2>
+                    <p class="section-subtitle">Get answers to common questions about P2P energy trading</p>
                 </div>
-                <div id="energyListings" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    <!-- Listings will be populated here -->
-                </div>
-            </div>
-        </div>
-
-        <!-- Sell Energy Tab -->
-        <div id="sellContent" class="tab-content hidden">
-            <div class="bg-white rounded-lg card-shadow p-6">
-                <h2 class="text-2xl font-bold text-gray-900 mb-6">
-                    <i class="fas fa-plus-circle mr-2"></i>List Energy for Sale
-                </h2>
-                <form id="sellEnergyForm" class="space-y-6">
-                    <div>
-                        <label for="energyAmount" class="block text-sm font-medium text-gray-700 mb-2">
-                            Energy Amount (kWh)
-                        </label>
-                        <input type="number" id="energyAmount" name="energyAmount" step="0.01" min="0.01" 
-                               class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" 
-                               placeholder="Enter amount of energy to sell" required>
+                <div class="faq__list">
+                    <div class="faq-item">
+                        <button class="faq-question">
+                            <span>What is peer-to-peer energy trading?</span>
+                            <span class="faq-icon">+</span>
+                        </button>
+                        <div class="faq-answer">
+                            <p>P2P energy trading allows individuals and businesses to buy and sell electricity directly with each other, bypassing traditional utility companies. Using blockchain technology and smart contracts, participants can trade renewable energy at competitive prices within their local community.</p>
+                        </div>
                     </div>
-                    <div>
-                        <label for="energyPrice" class="block text-sm font-medium text-gray-700 mb-2">
-                            Price per kWh (ETH)
-                        </label>
-                        <input type="number" id="energyPrice" name="energyPrice" step="0.000001" min="0.000001" 
-                               class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" 
-                               placeholder="Enter price per kWh in ETH" required>
+                    <div class="faq-item">
+                        <button class="faq-question">
+                            <span>How does blockchain ensure transaction security?</span>
+                            <span class="faq-icon">+</span>
+                        </button>
+                        <div class="faq-answer">
+                            <p>Blockchain creates an immutable, transparent ledger of all energy transactions. Smart contracts automatically execute trades when conditions are met, eliminating intermediaries and reducing fraud risk. Each transaction is cryptographically secured and verified by the network.</p>
+                        </div>
                     </div>
-                    <button type="submit" class="w-full bg-green-500 text-white py-3 px-6 rounded-lg hover:bg-green-600 transition-colors font-medium">
-                        <i class="fas fa-tag mr-2"></i>List Energy for Sale
-                    </button>
-                </form>
+                    <div class="faq-item">
+                        <button class="faq-question">
+                            <span>Who can participate in P2P energy trading?</span>
+                            <span class="faq-icon">+</span>
+                        </button>
+                        <div class="faq-answer">
+                            <p>Anyone with renewable energy generation (like solar panels), energy storage systems, or even just energy consumption can participate. This includes homeowners, businesses, community organizations, and energy cooperatives.</p>
+                        </div>
+                    </div>
+                    <div class="faq-item">
+                        <button class="faq-question">
+                            <span>How is energy pricing determined?</span>
+                            <span class="faq-icon">+</span>
+                        </button>
+                        <div class="faq-answer">
+                            <p>Pricing is determined by real-time supply and demand within the local energy market. Our algorithm matches buyers and sellers based on their preferences, current grid conditions, and market rates, ensuring fair and competitive pricing for all participants.</p>
+                        </div>
+                    </div>
+                    <div class="faq-item">
+                        <button class="faq-question">
+                            <span>What equipment do I need to start trading?</span>
+                            <span class="faq-icon">+</span>
+                        </button>
+                        <div class="faq-answer">
+                            <p>You need a smart meter for accurate energy monitoring, and optionally renewable energy generation (solar panels) or storage systems. Our platform integrates with most existing smart home and energy management systems.</p>
+                        </div>
+                    </div>
+                    <div class="faq-item">
+                        <button class="faq-question">
+                            <span>Is P2P energy trading legal and regulated?</span>
+                            <span class="faq-icon">+</span>
+                        </button>
+                        <div class="faq-answer">
+                            <p>P2P energy trading is legal in many jurisdictions and is increasingly supported by regulatory frameworks worldwide. We ensure compliance with all local energy regulations and work closely with utilities and regulatory bodies.</p>
+                        </div>
+                    </div>
+                    <div class="faq-item">
+                        <button class="faq-question">
+                            <span>How are payments processed?</span>
+                            <span class="faq-icon">+</span>
+                        </button>
+                        <div class="faq-answer">
+                            <p>Payments are automatically processed through our secure payment system integrated with smart contracts. You can link bank accounts, credit cards, or use cryptocurrency. All transactions are recorded on the blockchain for transparency.</p>
+                        </div>
+                    </div>
+                    <div class="faq-item">
+                        <button class="faq-question">
+                            <span>What happens when my solar panels aren't generating?</span>
+                            <span class="faq-icon">+</span>
+                        </button>
+                        <div class="faq-answer">
+                            <p>When your renewable sources aren't producing energy, you can purchase from other community members who have excess generation or storage. The system automatically switches between buying and selling based on your real-time energy needs.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer" id="contact">
+        <div class="container">
+            <div class="footer__content">
+                <div class="footer__brand">
+                    <div class="footer__logo">⚡ Shakti Exchange</div>
+                    <p class="footer__description">Revolutionizing energy trading through blockchain technology and community-driven solutions.</p>
+                    <!-- <div class="footer__social">
+                        <a href="#" class="social-link" target="_blank">🐦</a>
+                        <a href="#" class="social-link" target="_blank">💼</a>
+                        <a href="#" class="social-link" target="_blank">📘</a>
+                        <a href="#" class="social-link" target="_blank">📺</a>
+                    </div> -->
+                </div>
+                <div class="footer__links">
+                    <div class="footer__group">
+                        <h4 class="footer__title">Platform</h4>
+                        <ul class="footer__list">
+                            <li><a href="#features">Features</a></li>
+                            <li><a href="#how-it-works">How It Works</a></li>
+                            <li><a href="#faq">FAQ</a></li>
+                        </ul>
+                    </div>
+                   
+                   
+                </div>
+                
+            </div>
+            <div class="footer__bottom">
+                <p>&copy; 2025 Shakti Exchange. All rights reserved.</p>
             </div>
         </div>
+    </footer>
 
-        <!-- My Listings Tab -->
-        <div id="myListingsContent" class="tab-content hidden">
-            <div class="bg-white rounded-lg card-shadow p-6">
-                <div class="flex justify-between items-center mb-6">
-                    <h2 class="text-2xl font-bold text-gray-900">
-                        <i class="fas fa-list mr-2"></i>My Energy Listings
-                    </h2>
-                    <button id="refreshMyListings" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition-colors">
-                        <i class="fas fa-sync-alt mr-2"></i>Refresh
-                    </button>
-                </div>
-                <div id="myEnergyListings" class="space-y-4">
-                    <!-- User's listings will be populated here -->
-                </div>
-            </div>
-        </div>
-
-        <!-- Transaction History Tab -->
-        <div id="historyContent" class="tab-content hidden">
-            <div class="bg-white rounded-lg card-shadow p-6">
-                <div class="flex justify-between items-center mb-6">
-                    <h2 class="text-2xl font-bold text-gray-900">
-                        <i class="fas fa-history mr-2"></i>Transaction History
-                    </h2>
-                    <button id="refreshHistory" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition-colors">
-                        <i class="fas fa-sync-alt mr-2"></i>Refresh
-                    </button>
-                </div>
-                <div class="overflow-x-auto">
-                    <table class="min-w-full table-auto">
-                        <thead class="bg-gray-50">
-                            <tr>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Amount (kWh)</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Price (ETH/kWh)</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total (ETH)</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Counterparty</th>
-                            </tr>
-                        </thead>
-                        <tbody id="transactionHistory" class="bg-white divide-y divide-gray-200">
-                            <!-- Transaction history will be populated here -->
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Include JavaScript files -->
-    <script src="config.js"></script>
-    <script src="app.js"></script>
+    <script src="app_landing.js"></script>
 </body>
 </html>

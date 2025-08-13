@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>P2P Energy Trading Platform</title>
+    
+    <!-- TailwindCSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    
+    <!-- Ethers.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.7.1/ethers.umd.min.js"></script>
+    
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        .gradient-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        
+        .card-shadow {
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        
+        .pulse-green {
+            animation: pulse-green 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+        
+        @keyframes pulse-green {
+            0%, 100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: .5;
+            }
+        }
+        
+        .loading-spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #3498db;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            animation: spin 2s linear infinite;
+            display: inline-block;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <!-- Navigation -->
+    <nav class="gradient-bg shadow-lg">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <i class="fas fa-bolt text-white text-2xl mr-3"></i>
+                    <h1 class="text-white text-xl font-bold">P2P Energy Trading</h1>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <div id="networkStatus" class="hidden bg-red-500 text-white px-3 py-1 rounded-full text-sm">
+                        Wrong Network
+                    </div>
+                    <div id="connectionStatus" class="bg-red-500 text-white px-3 py-1 rounded-full text-sm">
+                        Not Connected
+                    </div>
+                    <button id="connectWallet" class="bg-white text-blue-600 px-4 py-2 rounded-lg font-medium hover:bg-gray-100 transition-colors">
+                        Connect Wallet
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <!-- Loading Overlay -->
+        <div id="loadingOverlay" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+            <div class="bg-white p-6 rounded-lg flex items-center space-x-4">
+                <div class="loading-spinner"></div>
+                <span class="text-gray-700">Processing transaction...</span>
+            </div>
+        </div>
+
+        <!-- Wallet Info Section -->
+        <div id="walletInfo" class="hidden mb-8">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+                <div class="bg-white rounded-lg card-shadow p-6">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm font-medium text-gray-600">Wallet Address</p>
+                            <p id="walletAddress" class="text-lg font-semibold text-gray-900 truncate"></p>
+                        </div>
+                        <i class="fas fa-wallet text-blue-500 text-2xl"></i>
+                    </div>
+                </div>
+                
+                <div class="bg-white rounded-lg card-shadow p-6">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm font-medium text-gray-600">ETH Balance</p>
+                            <p id="ethBalance" class="text-lg font-semibold text-gray-900">0.00</p>
+                        </div>
+                        <i class="fab fa-ethereum text-purple-500 text-2xl"></i>
+                    </div>
+                </div>
+                
+                <div class="bg-white rounded-lg card-shadow p-6">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm font-medium text-gray-600">Energy Balance</p>
+                            <p id="energyBalance" class="text-lg font-semibold text-green-600">0 kWh</p>
+                        </div>
+                        <i class="fas fa-battery-full text-green-500 text-2xl"></i>
+                    </div>
+                </div>
+                
+                <div class="bg-white rounded-lg card-shadow p-6">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm font-medium text-gray-600">Pending Earnings</p>
+                            <p id="pendingEarnings" class="text-lg font-semibold text-yellow-600">0.00 ETH</p>
+                            <button id="withdrawBtn" class="mt-2 bg-yellow-500 text-white px-3 py-1 rounded text-sm hover:bg-yellow-600 transition-colors">
+                                Withdraw
+                            </button>
+                        </div>
+                        <i class="fas fa-coins text-yellow-500 text-2xl"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Registration Section -->
+        <div id="registrationSection" class="hidden mb-8">
+            <div class="bg-white rounded-lg card-shadow p-6">
+                <h2 class="text-2xl font-bold text-gray-900 mb-4">
+                    <i class="fas fa-user-plus mr-2"></i>Register Your Role
+                </h2>
+                <p class="text-gray-600 mb-6">Choose your role in the energy trading platform:</p>
+                <div class="flex space-x-4">
+                    <button id="registerProducer" class="bg-green-500 text-white px-6 py-3 rounded-lg hover:bg-green-600 transition-colors flex items-center">
+                        <i class="fas fa-solar-panel mr-2"></i>Register as Producer
+                    </button>
+                    <button id="registerConsumer" class="bg-blue-500 text-white px-6 py-3 rounded-lg hover:bg-blue-600 transition-colors flex items-center">
+                        <i class="fas fa-home mr-2"></i>Register as Consumer
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Contract Status -->
+        <div id="contractStatus" class="hidden mb-8">
+            <div class="bg-white rounded-lg card-shadow p-4">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center">
+                        <div id="contractStatusIcon" class="w-3 h-3 rounded-full bg-green-500 mr-3 pulse-green"></div>
+                        <span class="text-sm font-medium text-gray-700">Contract Status: </span>
+                        <span id="contractStatusText" class="text-sm font-medium text-green-600 ml-1">Active</span>
+                    </div>
+                    <div id="ownerControls" class="hidden">
+                        <button id="togglePauseBtn" class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 transition-colors text-sm">
+                            Pause Contract
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content Tabs -->
+        <div class="mb-8">
+            <div class="border-b border-gray-200">
+                <nav class="-mb-px flex space-x-8">
+                    <button id="marketplaceTab" class="tab-button py-2 px-1 border-b-2 border-blue-500 font-medium text-sm text-blue-600">
+                        <i class="fas fa-store mr-2"></i>Marketplace
+                    </button>
+                    <button id="sellTab" class="tab-button py-2 px-1 border-b-2 border-transparent font-medium text-sm text-gray-500 hover:text-gray-700 hover:border-gray-300">
+                        <i class="fas fa-plus-circle mr-2"></i>Sell Energy
+                    </button>
+                    <button id="myListingsTab" class="tab-button py-2 px-1 border-b-2 border-transparent font-medium text-sm text-gray-500 hover:text-gray-700 hover:border-gray-300">
+                        <i class="fas fa-list mr-2"></i>My Listings
+                    </button>
+                    <button id="historyTab" class="tab-button py-2 px-1 border-b-2 border-transparent font-medium text-sm text-gray-500 hover:text-gray-700 hover:border-gray-300">
+                        <i class="fas fa-history mr-2"></i>History
+                    </button>
+                </nav>
+            </div>
+        </div>
+
+        <!-- Tab Contents -->
+        
+        <!-- Marketplace Tab -->
+        <div id="marketplaceContent" class="tab-content">
+            <div class="bg-white rounded-lg card-shadow p-6">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-2xl font-bold text-gray-900">
+                        <i class="fas fa-store mr-2"></i>Energy Marketplace
+                    </h2>
+                    <button id="refreshMarketplace" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition-colors">
+                        <i class="fas fa-sync-alt mr-2"></i>Refresh
+                    </button>
+                </div>
+                <div id="energyListings" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <!-- Listings will be populated here -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Sell Energy Tab -->
+        <div id="sellContent" class="tab-content hidden">
+            <div class="bg-white rounded-lg card-shadow p-6">
+                <h2 class="text-2xl font-bold text-gray-900 mb-6">
+                    <i class="fas fa-plus-circle mr-2"></i>List Energy for Sale
+                </h2>
+                <form id="sellEnergyForm" class="space-y-6">
+                    <div>
+                        <label for="energyAmount" class="block text-sm font-medium text-gray-700 mb-2">
+                            Energy Amount (kWh)
+                        </label>
+                        <input type="number" id="energyAmount" name="energyAmount" step="0.01" min="0.01" 
+                               class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" 
+                               placeholder="Enter amount of energy to sell" required>
+                    </div>
+                    <div>
+                        <label for="energyPrice" class="block text-sm font-medium text-gray-700 mb-2">
+                            Price per kWh (ETH)
+                        </label>
+                        <input type="number" id="energyPrice" name="energyPrice" step="0.000001" min="0.000001" 
+                               class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" 
+                               placeholder="Enter price per kWh in ETH" required>
+                    </div>
+                    <button type="submit" class="w-full bg-green-500 text-white py-3 px-6 rounded-lg hover:bg-green-600 transition-colors font-medium">
+                        <i class="fas fa-tag mr-2"></i>List Energy for Sale
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- My Listings Tab -->
+        <div id="myListingsContent" class="tab-content hidden">
+            <div class="bg-white rounded-lg card-shadow p-6">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-2xl font-bold text-gray-900">
+                        <i class="fas fa-list mr-2"></i>My Energy Listings
+                    </h2>
+                    <button id="refreshMyListings" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition-colors">
+                        <i class="fas fa-sync-alt mr-2"></i>Refresh
+                    </button>
+                </div>
+                <div id="myEnergyListings" class="space-y-4">
+                    <!-- User's listings will be populated here -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Transaction History Tab -->
+        <div id="historyContent" class="tab-content hidden">
+            <div class="bg-white rounded-lg card-shadow p-6">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-2xl font-bold text-gray-900">
+                        <i class="fas fa-history mr-2"></i>Transaction History
+                    </h2>
+                    <button id="refreshHistory" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition-colors">
+                        <i class="fas fa-sync-alt mr-2"></i>Refresh
+                    </button>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="min-w-full table-auto">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Amount (kWh)</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Price (ETH/kWh)</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total (ETH)</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Counterparty</th>
+                            </tr>
+                        </thead>
+                        <tbody id="transactionHistory" class="bg-white divide-y divide-gray-200">
+                            <!-- Transaction history will be populated here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Include JavaScript files -->
+    <script src="config.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
