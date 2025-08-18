@@ -3,296 +3,1649 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Shakti Exchange</title>
-    <link rel="icon" type="image/x-icon" href="/assets/energy-saving.png">
-    
-    <!-- TailwindCSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    
-    <!-- SweetAlert2 -->
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    
-    <!-- Ethers.js -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.7.1/ethers.umd.min.js"></script>
-    
-    <!-- Font Awesome for icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
+    <title>Shakti Exchange -Dashboard</title>
+      <link rel="icon" type="image/x-icon" href="/assets/energy-saving.png">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/web3/1.8.0/web3.min.js"></script>
     <style>
-        .gradient-bg {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
-        
-        .card-shadow {
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+
+        body {
+            font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #0a0a0a;
+            background-image: 
+                radial-gradient(circle at 20% 80%, rgba(120, 119, 198, 0.3) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(255, 119, 198, 0.15) 0%, transparent 50%),
+                radial-gradient(circle at 40% 40%, rgba(120, 119, 198, 0.1) 0%, transparent 50%);
+            min-height: 100vh;
+            color: #e1e5e9;
+            overflow-x: hidden;
         }
-        
-        .pulse-green {
-            animation: pulse-green 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
         }
-        
-        @keyframes pulse-green {
-            0%, 100% {
-                opacity: 1;
+
+        .header {
+            background: rgba(15, 15, 25, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 24px;
+            padding: 40px;
+            margin-bottom: 30px;
+            text-align: center;
+            border: 1px solid rgba(0, 191, 255, 0.2);
+            box-shadow: 
+                0 0 50px rgba(0, 191, 255, 0.1),
+                inset 0 1px 0 rgba(255, 255, 255, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(0, 191, 255, 0.03), transparent);
+            animation: rotate 8s linear infinite;
+            pointer-events: none;
+        }
+
+        @keyframes rotate {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .header h1 {
+            color: #00bfff;
+            font-size: 3.2em;
+            margin-bottom: 15px;
+            text-shadow: 
+                0 0 20px rgba(0, 191, 255, 0.5),
+                0 0 40px rgba(0, 191, 255, 0.3);
+            font-weight: 700;
+            letter-spacing: -1px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .header p {
+            color: rgba(225, 229, 233, 0.8);
+            margin-top: 10px;
+            font-size: 1.2em;
+            position: relative;
+            z-index: 2;
+        }
+
+        .wallet-status {
+            background: rgba(15, 15, 25, 0.9);
+            backdrop-filter: blur(15px);
+            padding: 25px;
+            border-radius: 20px;
+            margin: 25px 0;
+            display: none;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            border: 1px solid rgba(0, 191, 255, 0.3);
+            box-shadow: 0 8px 32px rgba(0, 191, 255, 0.1);
+            position: relative;
+            z-index: 2;
+        }
+
+        .status-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            padding: 15px;
+            background: rgba(0, 191, 255, 0.05);
+            border-radius: 12px;
+            border: 1px solid rgba(0, 191, 255, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .status-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(0, 191, 255, 0.2);
+            border-color: rgba(0, 191, 255, 0.3);
+        }
+
+        .status-label {
+            font-size: 0.9em;
+            color: #888;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .status-value {
+            font-size: 1.3em;
+            font-weight: bold;
+            color: #00bfff;
+            text-shadow: 0 0 10px rgba(0, 191, 255, 0.3);
+        }
+
+        .tabs {
+            display: flex;
+            background: rgba(15, 15, 25, 0.6);
+            border-radius: 20px;
+            padding: 8px;
+            margin-bottom: 30px;
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(0, 191, 255, 0.2);
+            overflow-x: auto;
+        }
+
+        .tab {
+            flex: 1;
+            padding: 18px 25px;
+            text-align: center;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            color: #888;
+            font-weight: 600;
+            font-size: 1.1em;
+            white-space: nowrap;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .tab::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(0, 191, 255, 0.1), transparent);
+            transition: left 0.6s ease;
+        }
+
+        .tab:hover::before {
+            left: 100%;
+        }
+
+        .tab.active {
+            background: linear-gradient(135deg, rgba(0, 191, 255, 0.2), rgba(0, 191, 255, 0.1));
+            color: #00bfff;
+            transform: translateY(-3px);
+            box-shadow: 
+                0 10px 30px rgba(0, 191, 255, 0.2),
+                inset 0 1px 0 rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(0, 191, 255, 0.3);
+        }
+
+        .tab-content {
+            display: none;
+            background: rgba(15, 15, 25, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 24px;
+            padding: 40px;
+            box-shadow: 
+                0 20px 60px rgba(0, 0, 0, 0.5),
+                0 0 50px rgba(0, 191, 255, 0.05),
+                inset 0 1px 0 rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(0, 191, 255, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .tab-content::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(0, 191, 255, 0.5), transparent);
+        }
+
+        .tab-content.active {
+            display: block;
+            animation: slideUp 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        @keyframes slideUp {
+            from { 
+                opacity: 0; 
+                transform: translateY(30px);
             }
-            50% {
-                opacity: .5;
+            to { 
+                opacity: 1; 
+                transform: translateY(0);
             }
         }
-        
-        .loading-spinner {
-            border: 4px solid #f3f3f3;
-            border-top: 4px solid #3498db;
+
+        .tab-content h2 {
+            color: #00bfff;
+            font-size: 2.2em;
+            margin-bottom: 30px;
+            text-align: center;
+            text-shadow: 0 0 20px rgba(0, 191, 255, 0.3);
+            font-weight: 700;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: 600;
+            color: #00bfff;
+            font-size: 1.1em;
+            text-shadow: 0 0 10px rgba(0, 191, 255, 0.3);
+        }
+
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 18px 20px;
+            background: rgba(0, 0, 0, 0.3);
+            border: 2px solid rgba(0, 191, 255, 0.3);
+            border-radius: 15px;
+            font-size: 16px;
+            color: #e1e5e9;
+            transition: all 0.4s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .form-group input:focus, .form-group select:focus {
+            outline: none;
+            border-color: #00bfff;
+            box-shadow: 
+                0 0 0 4px rgba(0, 191, 255, 0.1),
+                0 0 20px rgba(0, 191, 255, 0.2);
+            transform: translateY(-2px);
+            background: rgba(0, 0, 0, 0.5);
+        }
+
+        .form-group input::placeholder {
+            color: rgba(225, 229, 233, 0.5);
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #00bfff, #0080ff);
+            color: white;
+            border: none;
+            padding: 18px 35px;
+            border-radius: 15px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+            box-shadow: 
+                0 8px 25px rgba(0, 191, 255, 0.3),
+                inset 0 1px 0 rgba(255, 255, 255, 0.2);
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.6s ease;
+        }
+
+        .btn:hover::before {
+            left: 100%;
+        }
+
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 
+                0 15px 35px rgba(0, 191, 255, 0.4),
+                inset 0 1px 0 rgba(255, 255, 255, 0.3);
+        }
+
+        .btn:active {
+            transform: translateY(-1px);
+        }
+
+        .btn:disabled {
+            background: rgba(100, 100, 100, 0.3);
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .btn-connect {
+            background: linear-gradient(135deg, #00ff88, #00cc66);
+            box-shadow: 0 8px 25px rgba(0, 255, 136, 0.3);
+            margin: 15px 0;
+        }
+
+        .btn-connect:hover {
+            box-shadow: 0 15px 35px rgba(0, 255, 136, 0.4);
+        }
+
+        .btn-withdraw {
+            background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+            box-shadow: 0 8px 25px rgba(255, 107, 107, 0.3);
+        }
+
+        .btn-withdraw:hover {
+            box-shadow: 0 15px 35px rgba(255, 107, 107, 0.4);
+        }
+
+        .listings-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+            gap: 25px;
+            margin-top: 30px;
+        }
+
+        .listing-card {
+            background: rgba(15, 15, 25, 0.9);
+            backdrop-filter: blur(15px);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 
+                0 15px 40px rgba(0, 0, 0, 0.3),
+                0 0 20px rgba(0, 191, 255, 0.1);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 1px solid rgba(0, 191, 255, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .listing-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, #00bfff, #ff6b6b, #00bfff);
+            background-size: 200% 100%;
+            animation: shimmer 3s ease-in-out infinite;
+        }
+
+        @keyframes shimmer {
+            0%, 100% { background-position: 200% 0; }
+            50% { background-position: -200% 0; }
+        }
+
+        .listing-card:hover {
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 
+                0 25px 60px rgba(0, 0, 0, 0.4),
+                0 0 40px rgba(0, 191, 255, 0.2);
+            border-color: rgba(0, 191, 255, 0.4);
+        }
+
+        .listing-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .listing-id {
+            background: linear-gradient(135deg, #00bfff, #0080ff);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 25px;
+            font-size: 0.9em;
+            font-weight: bold;
+            text-shadow: 0 0 10px rgba(0, 191, 255, 0.5);
+            box-shadow: 0 4px 15px rgba(0, 191, 255, 0.3);
+        }
+
+        .listing-producer {
+            font-weight: 700;
+            color: #00ff88;
+            text-shadow: 0 0 10px rgba(0, 255, 136, 0.3);
+        }
+
+        .listing-details {
+            margin: 20px 0;
+        }
+
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 15px;
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(0, 191, 255, 0.1);
+        }
+
+        .detail-label {
+            font-weight: 600;
+            color: #888;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-size: 0.9em;
+        }
+
+        .detail-value {
+            color: #00bfff;
+            font-weight: 700;
+            text-shadow: 0 0 8px rgba(0, 191, 255, 0.3);
+        }
+
+        .purchase-section {
+            margin-top: 25px;
+            padding: 25px;
+            background: rgba(0, 191, 255, 0.05);
+            border-radius: 15px;
+            border: 2px dashed rgba(0, 191, 255, 0.3);
+            backdrop-filter: blur(10px);
+        }
+
+        .transaction-list {
+            max-height: 600px;
+            overflow-y: auto;
+            padding-right: 10px;
+        }
+
+        .transaction-list::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .transaction-list::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 10px;
+        }
+
+        .transaction-list::-webkit-scrollbar-thumb {
+            background: linear-gradient(180deg, #00bfff, #0080ff);
+            border-radius: 10px;
+        }
+
+        .transaction-item {
+            background: rgba(15, 15, 25, 0.7);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 20px;
+            border-left: 4px solid #00bfff;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+            border: 1px solid rgba(0, 191, 255, 0.1);
+        }
+
+        .transaction-item:hover {
+            transform: translateX(5px);
+            border-left-color: #00ff88;
+            box-shadow: 0 12px 35px rgba(0, 191, 255, 0.1);
+        }
+
+        .transaction-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .transaction-type {
+            padding: 8px 20px;
+            border-radius: 25px;
+            font-size: 0.9em;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .transaction-type.buy {
+            background: rgba(0, 255, 136, 0.2);
+            color: #00ff88;
+            border: 1px solid rgba(0, 255, 136, 0.3);
+            text-shadow: 0 0 10px rgba(0, 255, 136, 0.3);
+        }
+
+        .transaction-type.sell {
+            background: rgba(255, 107, 107, 0.2);
+            color: #ff6b6b;
+            border: 1px solid rgba(255, 107, 107, 0.3);
+            text-shadow: 0 0 10px rgba(255, 107, 107, 0.3);
+        }
+
+        .alert {
+            padding: 20px;
+            border-radius: 15px;
+            margin: 20px 0;
+            font-weight: 600;
+            backdrop-filter: blur(15px);
+            border: 1px solid;
+            animation: slideIn 0.5s ease;
+        }
+
+        @keyframes slideIn {
+            from { 
+                opacity: 0; 
+                transform: translateX(-20px);
+            }
+            to { 
+                opacity: 1; 
+                transform: translateX(0);
+            }
+        }
+
+        .alert-success {
+            background: rgba(0, 255, 136, 0.1);
+            color: #00ff88;
+            border-color: rgba(0, 255, 136, 0.3);
+            box-shadow: 0 0 20px rgba(0, 255, 136, 0.1);
+        }
+
+        .alert-error {
+            background: rgba(255, 107, 107, 0.1);
+            color: #ff6b6b;
+            border-color: rgba(255, 107, 107, 0.3);
+            box-shadow: 0 0 20px rgba(255, 107, 107, 0.1);
+        }
+
+        .alert-info {
+            background: rgba(0, 191, 255, 0.1);
+            color: #00bfff;
+            border-color: rgba(0, 191, 255, 0.3);
+            box-shadow: 0 0 20px rgba(0, 191, 255, 0.1);
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 40px;
+        }
+
+        .spinner {
+            border: 4px solid rgba(0, 191, 255, 0.1);
+            border-top: 4px solid #00bfff;
             border-radius: 50%;
-            width: 20px;
-            height: 20px;
-            animation: spin 2s linear infinite;
-            display: inline-block;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 15px;
+            box-shadow: 0 0 20px rgba(0, 191, 255, 0.3);
         }
-        
+
         @keyframes spin {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
+
+        .two-column {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+        }
+
+        .wallet-balance-card {
+            background: rgba(0, 255, 136, 0.1);
+            border: 2px solid rgba(0, 255, 136, 0.3);
+            border-radius: 20px;
+            padding: 25px;
+            text-align: center;
+            margin: 20px 0;
+            backdrop-filter: blur(15px);
+            box-shadow: 0 0 30px rgba(0, 255, 136, 0.1);
+        }
+
+        .wallet-balance-card h3 {
+            color: #00ff88;
+            margin-bottom: 15px;
+            font-size: 1.4em;
+            text-shadow: 0 0 15px rgba(0, 255, 136, 0.3);
+        }
+
+        .balance-amount {
+            font-size: 2.5em;
+            font-weight: bold;
+            color: #00ff88;
+            text-shadow: 0 0 20px rgba(0, 255, 136, 0.5);
+            margin-bottom: 10px;
+        }
+
+        .refresh-btn {
+            background: rgba(0, 191, 255, 0.2);
+            border: 1px solid rgba(0, 191, 255, 0.3);
+            padding: 10px 20px;
+            border-radius: 10px;
+            color: #00bfff;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 20px;
+        }
+
+        .refresh-btn:hover {
+            background: rgba(0, 191, 255, 0.3);
+            transform: translateY(-2px);
+        }
+
+        @media (max-width: 768px) {
+            .two-column {
+                grid-template-columns: 1fr;
+            }
+            
+            .wallet-status {
+                grid-template-columns: 1fr;
+            }
+            
+            .tabs {
+                flex-direction: column;
+            }
+            
+            .listing-header {
+                flex-direction: column;
+                gap: 15px;
+                align-items: flex-start;
+            }
+
+            .header h1 {
+                font-size: 2.2em;
+            }
+
+            .container {
+                padding: 15px;
+            }
+        }
+
+        .glow-text {
+            animation: glow 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes glow {
+            from { text-shadow: 0 0 20px rgba(0, 191, 255, 0.3); }
+            to { text-shadow: 0 0 30px rgba(0, 191, 255, 0.6), 0 0 40px rgba(0, 191, 255, 0.3); }
+        }
+
+        .no-data {
+            text-align: center;
+            padding: 60px 20px;
+            color: #666;
+            font-size: 1.2em;
+        }
+
+        .no-data::before {
+            content: '📊';
+            display: block;
+            font-size: 4em;
+            margin-bottom: 20px;
+            opacity: 0.3;
+        }
     </style>
 </head>
-<body class="bg-gray-50 min-h-screen">
-    <!-- Navigation -->
-    <nav class="gradient-bg shadow-lg">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between h-16">
-                <div class="flex items-center">
-                    <i class="fas fa-bolt text-white text-2xl mr-3"></i>
-                    <h1 class="text-white text-xl font-bold">Shakti Exchange</h1>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1 class="glow-text">Shakti Exchange</h1>
+            <p>Decentralized renewable energy trading on the blockchain</p>
+            
+            <button id="connectWallet" class="btn btn-connect">Connect MetaMask Wallet</button>
+            
+            <div class="wallet-status" id="walletStatus">
+                <div class="status-item">
+                    <span class="status-label">Wallet Address</span>
+                    <span class="status-value" id="walletAddress">-</span>
                 </div>
-                <div class="flex items-center space-x-4">
-                    <div id="networkStatus" class="hidden bg-red-500 text-white px-3 py-1 rounded-full text-sm">
-                        Wrong Network
-                    </div>
-                    <div id="connectionStatus" class="bg-red-500 text-white px-3 py-1 rounded-full text-sm">
-                        Not Connected
-                    </div>
-                    <button id="connectWallet" class="bg-white text-blue-600 px-4 py-2 rounded-lg font-medium hover:bg-gray-100 transition-colors">
-                        Connect Wallet
-                    </button>
+                <div class="status-item">
+                    <span class="status-label">Energy Balance</span>
+                    <span class="status-value" id="energyBalance">- kWh</span>
                 </div>
-            </div>
-        </div>
-    </nav>
-
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <!-- Loading Overlay -->
-        <div id="loadingOverlay" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
-            <div class="bg-white p-6 rounded-lg flex items-center space-x-4">
-                <div class="loading-spinner"></div>
-                <span class="text-gray-700">Processing transaction...</span>
-            </div>
-        </div>
-
-        <!-- Wallet Info Section -->
-        <div id="walletInfo" class="hidden mb-8">
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
-                <div class="bg-white rounded-lg card-shadow p-6">
-                    <div class="flex items-center justify-between">
-                        <div>
-                            <p class="text-sm font-medium text-gray-600">Wallet Address</p>
-                            <p id="walletAddress" class="text-lg font-semibold text-gray-900 truncate"></p>
-                        </div>
-                        <i class="fas fa-wallet text-blue-500 text-2xl"></i>
-                    </div>
+                <div class="status-item">
+                    <span class="status-label">Pending Withdrawals</span>
+                    <span class="status-value" id="pendingWithdrawals">- ETH</span>
                 </div>
-                
-                <div class="bg-white rounded-lg card-shadow p-6">
-                    <div class="flex items-center justify-between">
-                        <div>
-                            <p class="text-sm font-medium text-gray-600">ETH Balance</p>
-                            <p id="ethBalance" class="text-lg font-semibold text-gray-900">0.00</p>
-                        </div>
-                        <i class="fab fa-ethereum text-purple-500 text-2xl"></i>
-                    </div>
+                <div class="status-item">
+                    <span class="status-label">User Name</span>
+                    <span class="status-value" id="userName">-</span>
                 </div>
-                
-                <div class="bg-white rounded-lg card-shadow p-6">
-                    <div class="flex items-center justify-between">
-                        <div>
-                            <p class="text-sm font-medium text-gray-600">Energy Balance</p>
-                            <p id="energyBalance" class="text-lg font-semibold text-green-600">0 kWh</p>
-                        </div>
-                        <i class="fas fa-battery-full text-green-500 text-2xl"></i>
-                    </div>
-                </div>
-                
-                <div class="bg-white rounded-lg card-shadow p-6">
-                    <div class="flex items-center justify-between">
-                        <div>
-                            <p class="text-sm font-medium text-gray-600">Pending Earnings</p>
-                            <p id="pendingEarnings" class="text-lg font-semibold text-yellow-600">0.00 ETH</p>
-                            <button id="withdrawBtn" class="mt-2 bg-yellow-500 text-white px-3 py-1 rounded text-sm hover:bg-yellow-600 transition-colors">
-                                Withdraw
-                            </button>
-                        </div>
-                        <i class="fas fa-coins text-yellow-500 text-2xl"></i>
-                    </div>
+                <div class="status-item">
+                    <span class="status-label">ETH Balance</span>
+                    <span class="status-value" id="ethBalance">- ETH</span>
                 </div>
             </div>
         </div>
 
-        <!-- Registration Section -->
-        <div id="registrationSection" class="hidden mb-8">
-            <div class="bg-white rounded-lg card-shadow p-6">
-                <h2 class="text-2xl font-bold text-gray-900 mb-4">
-                    <i class="fas fa-user-plus mr-2"></i>Register Your Role
-                </h2>
-                <p class="text-gray-600 mb-6">Choose your role in the energy trading platform:</p>
-                <div class="flex space-x-4">
-                    <button id="registerProducer" class="bg-green-500 text-white px-6 py-3 rounded-lg hover:bg-green-600 transition-colors flex items-center">
-                        <i class="fas fa-solar-panel mr-2"></i>Register as Producer
-                    </button>
-                    <button id="registerConsumer" class="bg-blue-500 text-white px-6 py-3 rounded-lg hover:bg-blue-600 transition-colors flex items-center">
-                        <i class="fas fa-home mr-2"></i>Register as Consumer
-                    </button>
+        <div class="tabs" id="tabsContainer">
+            <div class="tab active" data-tab="register" id="registerTab">Register</div>
+            <div class="tab" data-tab="marketplace">Marketplace</div>
+            <div class="tab" data-tab="sell">Sell Energy</div>
+            <div class="tab" data-tab="history">History</div>
+            <div class="tab" data-tab="wallet">Wallet</div>
+        </div>
+
+        <div id="alerts"></div>
+
+        <!-- Register Tab -->
+        <div class="tab-content active" id="register">
+            <h2>Register as Energy Trader</h2>
+            <div class="two-column">
+                <div class="form-group">
+                    <label for="userName">Your Name:</label>
+                    <input type="text" id="userNameInput" placeholder="Enter your full name">
+                </div>
+                <div class="form-group">
+                    <label for="userType">Registration Type:</label>
+                    <select id="userType">
+                        <option value="producer">Producer Only</option>
+                        <option value="consumer">Consumer Only</option>
+                        <option value="both">Producer & Consumer</option>
+                    </select>
                 </div>
             </div>
+            <button class="btn" onclick="registerUser()">Register Now</button>
         </div>
 
-        <!-- Contract Status -->
-        <div id="contractStatus" class="hidden mb-8">
-            <div class="bg-white rounded-lg card-shadow p-4">
-                <div class="flex items-center justify-between">
-                    <div class="flex items-center">
-                        <div id="contractStatusIcon" class="w-3 h-3 rounded-full bg-green-500 mr-3 pulse-green"></div>
-                        <span class="text-sm font-medium text-gray-700">Contract Status: </span>
-                        <span id="contractStatusText" class="text-sm font-medium text-green-600 ml-1">Active</span>
-                    </div>
-                    <div id="ownerControls" class="hidden">
-                        <button id="togglePauseBtn" class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 transition-colors text-sm">
-                            Pause Contract
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Main Content Tabs -->
-        <div class="mb-8">
-            <div class="border-b border-gray-200">
-                <nav class="-mb-px flex space-x-8">
-                    <button id="marketplaceTab" class="tab-button py-2 px-1 border-b-2 border-blue-500 font-medium text-sm text-blue-600">
-                        <i class="fas fa-store mr-2"></i>Marketplace
-                    </button>
-                    <button id="sellTab" class="tab-button py-2 px-1 border-b-2 border-transparent font-medium text-sm text-gray-500 hover:text-gray-700 hover:border-gray-300">
-                        <i class="fas fa-plus-circle mr-2"></i>Sell Energy
-                    </button>
-                    <button id="myListingsTab" class="tab-button py-2 px-1 border-b-2 border-transparent font-medium text-sm text-gray-500 hover:text-gray-700 hover:border-gray-300">
-                        <i class="fas fa-list mr-2"></i>My Listings
-                    </button>
-                    <button id="historyTab" class="tab-button py-2 px-1 border-b-2 border-transparent font-medium text-sm text-gray-500 hover:text-gray-700 hover:border-gray-300">
-                        <i class="fas fa-history mr-2"></i>History
-                    </button>
-                </nav>
-            </div>
-        </div>
-
-        <!-- Tab Contents -->
-        
         <!-- Marketplace Tab -->
-        <div id="marketplaceContent" class="tab-content">
-            <div class="bg-white rounded-lg card-shadow p-6">
-                <div class="flex justify-between items-center mb-6">
-                    <h2 class="text-2xl font-bold text-gray-900">
-                        <i class="fas fa-store mr-2"></i>Energy Marketplace
-                    </h2>
-                    <button id="refreshMarketplace" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition-colors">
-                        <i class="fas fa-sync-alt mr-2"></i>Refresh
-                    </button>
-                </div>
-                <div id="energyListings" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    <!-- Listings will be populated here -->
-                </div>
+        <div class="tab-content" id="marketplace">
+            <h2>Energy Marketplace</h2>
+            <button class="refresh-btn" onclick="loadListings()">Refresh Listings</button>
+            
+            <div class="loading" id="marketplaceLoading">
+                <div class="spinner"></div>
+                <p>Loading energy listings...</p>
+            </div>
+            
+            <div class="listings-grid" id="listingsGrid">
+                <!-- Listings will be populated here -->
             </div>
         </div>
 
         <!-- Sell Energy Tab -->
-        <div id="sellContent" class="tab-content hidden">
-            <div class="bg-white rounded-lg card-shadow p-6">
-                <h2 class="text-2xl font-bold text-gray-900 mb-6">
-                    <i class="fas fa-plus-circle mr-2"></i>List Energy for Sale
-                </h2>
-                <form id="sellEnergyForm" class="space-y-6">
-                    <div>
-                        <label for="energyAmount" class="block text-sm font-medium text-gray-700 mb-2">
-                            Energy Amount (kWh)
-                        </label>
-                        <input type="number" id="energyAmount" name="energyAmount" step="0.01" min="0.01" 
-                               class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" 
-                               placeholder="Enter amount of energy to sell" required>
-                    </div>
-                    <div>
-                        <label for="energyPrice" class="block text-sm font-medium text-gray-700 mb-2">
-                            Price per kWh (ETH)
-                        </label>
-                        <input type="number" id="energyPrice" name="energyPrice" step="0.000001" min="0.000001" 
-                               class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" 
-                               placeholder="Enter price per kWh in ETH" required>
-                    </div>
-                    <button type="submit" class="w-full bg-green-500 text-white py-3 px-6 rounded-lg hover:bg-green-600 transition-colors font-medium">
-                        <i class="fas fa-tag mr-2"></i>List Energy for Sale
-                    </button>
-                </form>
+        <div class="tab-content" id="sell">
+            <h2>List Energy for Sale</h2>
+            <div class="two-column">
+                <div class="form-group">
+                    <label for="sellAmount">Energy Amount (kWh):</label>
+                    <input type="number" id="sellAmount" placeholder="Enter amount in kWh" step="0.01">
+                </div>
+                <div class="form-group">
+                    <label for="sellPrice">Price per kWh (ETH):</label>
+                    <input type="number" id="sellPrice" placeholder="Enter price in ETH" step="0.001">
+                </div>
+            </div>
+            <button class="btn" onclick="sellEnergy()">List Energy for Sale</button>
+        </div>
+
+        <!-- History Tab -->
+        <div class="tab-content" id="history">
+            <h2>Transaction History</h2>
+            <div style="display: flex; gap: 15px; margin-bottom: 25px; flex-wrap: wrap;">
+                <button class="refresh-btn" onclick="loadTransactionHistory()">Refresh History</button>
+                <button class="btn btn-withdraw" onclick="withdrawFunds()">Withdraw Pending Funds</button>
+            </div>
+            
+            <div class="loading" id="historyLoading">
+                <div class="spinner"></div>
+                <p>Loading transaction history...</p>
+            </div>
+            
+            <div class="transaction-list" id="transactionList">
+                <!-- Transaction history will be populated here -->
             </div>
         </div>
 
-        <!-- My Listings Tab -->
-        <div id="myListingsContent" class="tab-content hidden">
-            <div class="bg-white rounded-lg card-shadow p-6">
-                <div class="flex justify-between items-center mb-6">
-                    <h2 class="text-2xl font-bold text-gray-900">
-                        <i class="fas fa-list mr-2"></i>My Energy Listings
-                    </h2>
-                    <button id="refreshMyListings" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition-colors">
-                        <i class="fas fa-sync-alt mr-2"></i>Refresh
-                    </button>
+        <!-- Wallet Tab -->
+        <div class="tab-content" id="wallet">
+            <h2>Wallet Dashboard</h2>
+            
+            <div class="wallet-balance-card">
+                <h3>ETH Balance</h3>
+                <div class="balance-amount" id="walletEthBalance">0.00 ETH</div>
+                <button class="refresh-btn" onclick="updateWalletBalance()">Refresh Balance</button>
+            </div>
+
+            <div class="two-column">
+                <div class="wallet-balance-card">
+                    <h3>Energy Balance</h3>
+                    <div class="balance-amount" id="walletEnergyBalance">0.00 kWh</div>
                 </div>
-                <div id="myEnergyListings" class="space-y-4">
-                    <!-- User's listings will be populated here -->
+                <div class="wallet-balance-card">
+                    <h3>Pending Earnings</h3>
+                    <div class="balance-amount" id="walletPendingBalance">0.00 ETH</div>
                 </div>
             </div>
-        </div>
 
-        <!-- Transaction History Tab -->
-        <div id="historyContent" class="tab-content hidden">
-            <div class="bg-white rounded-lg card-shadow p-6">
-                <div class="flex justify-between items-center mb-6">
-                    <h2 class="text-2xl font-bold text-gray-900">
-                        <i class="fas fa-history mr-2"></i>Transaction History
-                    </h2>
-                    <button id="refreshHistory" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition-colors">
-                        <i class="fas fa-sync-alt mr-2"></i>Refresh
-                    </button>
-                </div>
-                <div class="overflow-x-auto">
-                    <table class="min-w-full table-auto">
-                        <thead class="bg-gray-50">
-                            <tr>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Amount (kWh)</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Price (ETH/kWh)</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total (ETH)</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Counterparty</th>
-                            </tr>
-                        </thead>
-                        <tbody id="transactionHistory" class="bg-white divide-y divide-gray-200">
-                            <!-- Transaction history will be populated here -->
-                        </tbody>
-                    </table>
-                </div>
+            <div style="text-align: center; margin-top: 30px;">
+                <button class="btn btn-withdraw" onclick="withdrawFunds()">Withdraw All Funds</button>
             </div>
         </div>
     </div>
 
-    <!-- Include JavaScript files -->
-    <script src="config.js"></script>
-    <script src="app.js"></script>
+    <script>
+        let web3;
+        let contract;
+        let userAccount;
+        let isUserRegistered = false;
+
+        // Contract configuration
+        const CONTRACT_ADDRESS = '0x66E8741bdDE29bC70852E3CbE297BfB8a1eC5072'; // Replace with your contract address
+        const CONTRACT_ABI = [
+            {
+                "inputs": [],
+                "stateMutability": "nonpayable",
+                "type": "constructor"
+            },
+            {
+                "anonymous": false,
+                "inputs": [
+                    {"indexed": true, "internalType": "uint256", "name": "listingId", "type": "uint256"},
+                    {"indexed": true, "internalType": "address", "name": "producer", "type": "address"},
+                    {"indexed": false, "internalType": "string", "name": "producerName", "type": "string"},
+                    {"indexed": false, "internalType": "uint256", "name": "amount", "type": "uint256"},
+                    {"indexed": false, "internalType": "uint256", "name": "pricePerKWh", "type": "uint256"},
+                    {"indexed": false, "internalType": "uint256", "name": "timestamp", "type": "uint256"}
+                ],
+                "name": "EnergyListed",
+                "type": "event"
+            },
+            {
+                "anonymous": false,
+                "inputs": [
+                    {"indexed": true, "internalType": "uint256", "name": "listingId", "type": "uint256"},
+                    {"indexed": true, "internalType": "address", "name": "producer", "type": "address"},
+                    {"indexed": false, "internalType": "string", "name": "producerName", "type": "string"},
+                    {"indexed": true, "internalType": "address", "name": "consumer", "type": "address"},
+                    {"indexed": false, "internalType": "string", "name": "consumerName", "type": "string"},
+                    {"indexed": false, "internalType": "uint256", "name": "amount", "type": "uint256"},
+                    {"indexed": false, "internalType": "uint256", "name": "totalCost", "type": "uint256"},
+                    {"indexed": false, "internalType": "uint256", "name": "timestamp", "type": "uint256"}
+                ],
+                "name": "EnergyPurchased",
+                "type": "event"
+            },
+            {
+                "anonymous": false,
+                "inputs": [
+                    {"indexed": true, "internalType": "address", "name": "producer", "type": "address"},
+                    {"indexed": false, "internalType": "string", "name": "producerName", "type": "string"},
+                    {"indexed": false, "internalType": "uint256", "name": "amount", "type": "uint256"},
+                    {"indexed": false, "internalType": "uint256", "name": "timestamp", "type": "uint256"}
+                ],
+                "name": "FundsWithdrawn",
+                "type": "event"
+            },
+            {
+                "anonymous": false,
+                "inputs": [
+                    {"indexed": true, "internalType": "address", "name": "user", "type": "address"},
+                    {"indexed": false, "internalType": "string", "name": "name", "type": "string"},
+                    {"indexed": false, "internalType": "string", "name": "userType", "type": "string"},
+                    {"indexed": false, "internalType": "uint256", "name": "timestamp", "type": "uint256"}
+                ],
+                "name": "UserRegistered",
+                "type": "event"
+            },
+            {
+                "inputs": [{"internalType": "address", "name": "user", "type": "address"}, {"internalType": "uint256", "name": "amount", "type": "uint256"}],
+                "name": "addEnergyTokens",
+                "outputs": [],
+                "stateMutability": "nonpayable",
+                "type": "function"
+            },
+            {
+                "inputs": [{"internalType": "uint256", "name": "listingId", "type": "uint256"}, {"internalType": "uint256", "name": "desiredAmount", "type": "uint256"}],
+                "name": "buyEnergy",
+                "outputs": [],
+                "stateMutability": "payable",
+                "type": "function"
+            },
+            {
+                "inputs": [{"internalType": "uint256", "name": "listingId", "type": "uint256"}, {"internalType": "uint256", "name": "desiredAmount", "type": "uint256"}],
+                "name": "calculateCost",
+                "outputs": [{"internalType": "uint256", "name": "", "type": "uint256"}],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [],
+                "name": "emergencyWithdraw",
+                "outputs": [],
+                "stateMutability": "nonpayable",
+                "type": "function"
+            },
+            {
+                "inputs": [{"internalType": "address", "name": "", "type": "address"}],
+                "name": "energyBalances",
+                "outputs": [{"internalType": "uint256", "name": "", "type": "uint256"}],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [],
+                "name": "getAllListings",
+                "outputs": [{"components": [{"internalType": "uint256", "name": "id", "type": "uint256"}, {"internalType": "address", "name": "producer", "type": "address"}, {"internalType": "string", "name": "producerName", "type": "string"}, {"internalType": "uint256", "name": "amount", "type": "uint256"}, {"internalType": "uint256", "name": "pricePerKWh", "type": "uint256"}, {"internalType": "bool", "name": "active", "type": "bool"}, {"internalType": "uint256", "name": "timestamp", "type": "uint256"}], "internalType": "struct EnergyTrading.EnergyListing[]", "name": "", "type": "tuple[]"}],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [{"internalType": "address", "name": "user", "type": "address"}],
+                "name": "getEnergyBalance",
+                "outputs": [{"internalType": "uint256", "name": "", "type": "uint256"}],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [{"internalType": "uint256", "name": "listingId", "type": "uint256"}],
+                "name": "getListingById",
+                "outputs": [{"components": [{"internalType": "uint256", "name": "id", "type": "uint256"}, {"internalType": "address", "name": "producer", "type": "address"}, {"internalType": "string", "name": "producerName", "type": "string"}, {"internalType": "uint256", "name": "amount", "type": "uint256"}, {"internalType": "uint256", "name": "pricePerKWh", "type": "uint256"}, {"internalType": "bool", "name": "active", "type": "bool"}, {"internalType": "uint256", "name": "timestamp", "type": "uint256"}], "internalType": "struct EnergyTrading.EnergyListing", "name": "", "type": "tuple"}],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [],
+                "name": "getListings",
+                "outputs": [{"components": [{"internalType": "uint256", "name": "id", "type": "uint256"}, {"internalType": "address", "name": "producer", "type": "address"}, {"internalType": "string", "name": "producerName", "type": "string"}, {"internalType": "uint256", "name": "amount", "type": "uint256"}, {"internalType": "uint256", "name": "pricePerKWh", "type": "uint256"}, {"internalType": "bool", "name": "active", "type": "bool"}, {"internalType": "uint256", "name": "timestamp", "type": "uint256"}], "internalType": "struct EnergyTrading.EnergyListing[]", "name": "", "type": "tuple[]"}],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [{"internalType": "address", "name": "user", "type": "address"}],
+                "name": "getPendingWithdrawals",
+                "outputs": [{"internalType": "uint256", "name": "", "type": "uint256"}],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [{"internalType": "address", "name": "user", "type": "address"}],
+                "name": "getTransactionHistory",
+                "outputs": [{"components": [{"internalType": "uint256", "name": "listingId", "type": "uint256"}, {"internalType": "address", "name": "producer", "type": "address"}, {"internalType": "string", "name": "producerName", "type": "string"}, {"internalType": "address", "name": "consumer", "type": "address"}, {"internalType": "string", "name": "consumerName", "type": "string"}, {"internalType": "uint256", "name": "amount", "type": "uint256"}, {"internalType": "uint256", "name": "pricePerKWh", "type": "uint256"}, {"internalType": "uint256", "name": "totalCost", "type": "uint256"}, {"internalType": "uint256", "name": "timestamp", "type": "uint256"}, {"internalType": "string", "name": "transactionType", "type": "string"}], "internalType": "struct EnergyTrading.Transaction[]", "name": "", "type": "tuple[]"}],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [{"internalType": "address", "name": "user", "type": "address"}],
+                "name": "getUserInfo",
+                "outputs": [{"components": [{"internalType": "string", "name": "name", "type": "string"}, {"internalType": "bool", "name": "isRegistered", "type": "bool"}, {"internalType": "bool", "name": "isProducer", "type": "bool"}, {"internalType": "bool", "name": "isConsumer", "type": "bool"}], "internalType": "struct EnergyTrading.User", "name": "", "type": "tuple"}],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [{"internalType": "address", "name": "user", "type": "address"}],
+                "name": "getUserListings",
+                "outputs": [{"components": [{"internalType": "uint256", "name": "id", "type": "uint256"}, {"internalType": "address", "name": "producer", "type": "address"}, {"internalType": "string", "name": "producerName", "type": "string"}, {"internalType": "uint256", "name": "amount", "type": "uint256"}, {"internalType": "uint256", "name": "pricePerKWh", "type": "uint256"}, {"internalType": "bool", "name": "active", "type": "bool"}, {"internalType": "uint256", "name": "timestamp", "type": "uint256"}], "internalType": "struct EnergyTrading.EnergyListing[]", "name": "", "type": "tuple[]"}],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [],
+                "name": "isPaused",
+                "outputs": [{"internalType": "bool", "name": "", "type": "bool"}],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [{"internalType": "uint256", "name": "", "type": "uint256"}],
+                "name": "listings",
+                "outputs": [{"internalType": "uint256", "name": "id", "type": "uint256"}, {"internalType": "address", "name": "producer", "type": "address"}, {"internalType": "string", "name": "producerName", "type": "string"}, {"internalType": "uint256", "name": "amount", "type": "uint256"}, {"internalType": "uint256", "name": "pricePerKWh", "type": "uint256"}, {"internalType": "bool", "name": "active", "type": "bool"}, {"internalType": "uint256", "name": "timestamp", "type": "uint256"}],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [],
+                "name": "nextListingId",
+                "outputs": [{"internalType": "uint256", "name": "", "type": "uint256"}],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [],
+                "name": "owner",
+                "outputs": [{"internalType": "address", "name": "", "type": "address"}],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [],
+                "name": "paused",
+                "outputs": [{"internalType": "bool", "name": "", "type": "bool"}],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [{"internalType": "address", "name": "", "type": "address"}],
+                "name": "pendingWithdrawals",
+                "outputs": [{"internalType": "uint256", "name": "", "type": "uint256"}],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [{"internalType": "string", "name": "name", "type": "string"}],
+                "name": "registerAsConsumer",
+                "outputs": [],
+                "stateMutability": "nonpayable",
+                "type": "function"
+            },
+            {
+                "inputs": [{"internalType": "string", "name": "name", "type": "string"}],
+                "name": "registerAsProducer",
+                "outputs": [],
+                "stateMutability": "nonpayable",
+                "type": "function"
+            },
+            {
+                "inputs": [{"internalType": "string", "name": "name", "type": "string"}],
+                "name": "registerAsProducerAndConsumer",
+                "outputs": [],
+                "stateMutability": "nonpayable",
+                "type": "function"
+            },
+            {
+                "inputs": [{"internalType": "uint256", "name": "amount", "type": "uint256"}, {"internalType": "uint256", "name": "pricePerKWh", "type": "uint256"}],
+                "name": "sellEnergy",
+                "outputs": [],
+                "stateMutability": "nonpayable",
+                "type": "function"
+            },
+            {
+                "inputs": [],
+                "name": "togglePause",
+                "outputs": [],
+                "stateMutability": "nonpayable",
+                "type": "function"
+            },
+            {
+                "inputs": [{"internalType": "address", "name": "", "type": "address"}, {"internalType": "uint256", "name": "", "type": "uint256"}],
+                "name": "transactionHistory",
+                "outputs": [{"internalType": "uint256", "name": "listingId", "type": "uint256"}, {"internalType": "address", "name": "producer", "type": "address"}, {"internalType": "string", "name": "producerName", "type": "string"}, {"internalType": "address", "name": "consumer", "type": "address"}, {"internalType": "string", "name": "consumerName", "type": "string"}, {"internalType": "uint256", "name": "amount", "type": "uint256"}, {"internalType": "uint256", "name": "pricePerKWh", "type": "uint256"}, {"internalType": "uint256", "name": "totalCost", "type": "uint256"}, {"internalType": "uint256", "name": "timestamp", "type": "uint256"}, {"internalType": "string", "name": "transactionType", "type": "string"}],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [{"internalType": "address", "name": "user", "type": "address"}, {"internalType": "string", "name": "newName", "type": "string"}],
+                "name": "updateUserName",
+                "outputs": [],
+                "stateMutability": "nonpayable",
+                "type": "function"
+            },
+            {
+                "inputs": [{"internalType": "address", "name": "", "type": "address"}],
+                "name": "users",
+                "outputs": [{"internalType": "string", "name": "name", "type": "string"}, {"internalType": "bool", "name": "isRegistered", "type": "bool"}, {"internalType": "bool", "name": "isProducer", "type": "bool"}, {"internalType": "bool", "name": "isConsumer", "type": "bool"}],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [],
+                "name": "withdrawFunds",
+                "outputs": [],
+                "stateMutability": "nonpayable",
+                "type": "function"
+            },
+            {
+                "stateMutability": "payable",
+                "type": "receive"
+            }
+        ];
+
+        // Initialize the app
+        window.addEventListener('load', async () => {
+            if (typeof window.ethereum !== 'undefined') {
+                web3 = new Web3(window.ethereum);
+                contract = new web3.eth.Contract(CONTRACT_ABI, CONTRACT_ADDRESS);
+                
+                // Check if already connected
+                const accounts = await web3.eth.getAccounts();
+                if (accounts.length > 0) {
+                    await connectWallet();
+                }
+            } else {
+                showAlert('MetaMask not detected. Please install MetaMask to use this application.', 'error');
+            }
+
+            setupTabs();
+        });
+
+        // Connect wallet function
+        async function connectWallet() {
+            try {
+                if (typeof window.ethereum === 'undefined') {
+                    throw new Error('MetaMask not installed');
+                }
+
+                const accounts = await window.ethereum.request({
+                    method: 'eth_requestAccounts'
+                });
+
+                userAccount = accounts[0];
+                
+                document.getElementById('connectWallet').style.display = 'none';
+                document.getElementById('walletStatus').style.display = 'grid';
+                document.getElementById('walletAddress').textContent = 
+                    userAccount.substring(0, 6) + '...' + userAccount.substring(38);
+
+                await updateUserInfo();
+                await updateWalletBalance();
+                
+                showAlert('Wallet connected successfully!', 'success');
+
+                // Listen for account changes
+                window.ethereum.on('accountsChanged', async (accounts) => {
+                    if (accounts.length > 0) {
+                        userAccount = accounts[0];
+                        await updateUserInfo();
+                        await updateWalletBalance();
+                        location.reload(); // Refresh to reset state
+                    } else {
+                        location.reload();
+                    }
+                });
+
+            } catch (error) {
+                console.error('Error connecting wallet:', error);
+                showAlert('Failed to connect wallet: ' + error.message, 'error');
+            }
+        }
+
+        // Update user info and check registration status
+        async function updateUserInfo() {
+            try {
+                const userInfo = await contract.methods.getUserInfo(userAccount).call();
+                
+                if (userInfo.isRegistered) {
+                    isUserRegistered = true;
+                    document.getElementById('userName').textContent = userInfo.name;
+                    
+                    // Hide register tab if user is registered
+                    const registerTab = document.getElementById('registerTab');
+                    registerTab.style.display = 'none';
+                    
+                    // Switch to marketplace if currently on register tab
+                    if (document.querySelector('.tab.active').dataset.tab === 'register') {
+                        switchTab('marketplace');
+                    }
+                } else {
+                    isUserRegistered = false;
+                    document.getElementById('userName').textContent = 'Not Registered';
+                }
+
+                // Update energy balance
+                const energyBalance = await contract.methods.getEnergyBalance(userAccount).call();
+                document.getElementById('energyBalance').textContent = 
+                    (parseFloat(web3.utils.fromWei(energyBalance, 'ether'))).toFixed(2) + ' kWh';
+
+                // Update pending withdrawals
+                const pendingWithdrawals = await contract.methods.getPendingWithdrawals(userAccount).call();
+                document.getElementById('pendingWithdrawals').textContent = 
+                    (parseFloat(web3.utils.fromWei(pendingWithdrawals, 'ether'))).toFixed(4) + ' ETH';
+
+            } catch (error) {
+                console.error('Error updating user info:', error);
+                showAlert('Failed to load user information', 'error');
+            }
+        }
+
+        // Update wallet balance
+        async function updateWalletBalance() {
+            try {
+                const balance = await web3.eth.getBalance(userAccount);
+                const ethBalance = parseFloat(web3.utils.fromWei(balance, 'ether')).toFixed(4);
+                
+                document.getElementById('ethBalance').textContent = ethBalance + ' ETH';
+                document.getElementById('walletEthBalance').textContent = ethBalance + ' ETH';
+
+                // Update energy balance in wallet tab
+                const energyBalance = await contract.methods.getEnergyBalance(userAccount).call();
+                document.getElementById('walletEnergyBalance').textContent = 
+                    (parseFloat(web3.utils.fromWei(energyBalance, 'ether'))).toFixed(2) + ' kWh';
+
+                // Update pending withdrawals in wallet tab
+                const pendingWithdrawals = await contract.methods.getPendingWithdrawals(userAccount).call();
+                document.getElementById('walletPendingBalance').textContent = 
+                    (parseFloat(web3.utils.fromWei(pendingWithdrawals, 'ether'))).toFixed(4) + ' ETH';
+
+            } catch (error) {
+                console.error('Error updating wallet balance:', error);
+                showAlert('Failed to update wallet balance', 'error');
+            }
+        }
+
+        // Register user function
+        async function registerUser() {
+            try {
+                if (!userAccount) {
+                    showAlert('Please connect your wallet first', 'error');
+                    return;
+                }
+
+                const name = document.getElementById('userNameInput').value.trim();
+                const userType = document.getElementById('userType').value;
+
+                if (!name) {
+                    showAlert('Please enter your name', 'error');
+                    return;
+                }
+
+                let method;
+                switch (userType) {
+                    case 'producer':
+                        method = contract.methods.registerAsProducer(name);
+                        break;
+                    case 'consumer':
+                        method = contract.methods.registerAsConsumer(name);
+                        break;
+                    case 'both':
+                        method = contract.methods.registerAsProducerAndConsumer(name);
+                        break;
+                }
+
+                showLoading('Registering user...');
+                
+                await method.send({ from: userAccount });
+                
+                hideLoading();
+                showAlert('Registration successful!', 'success');
+                
+                await updateUserInfo();
+                
+                // Clear form
+                document.getElementById('userNameInput').value = '';
+
+            } catch (error) {
+                hideLoading();
+                console.error('Error registering user:', error);
+                showAlert('Registration failed: ' + error.message, 'error');
+            }
+        }
+
+        // Load marketplace listings
+        async function loadListings() {
+            try {
+                if (!userAccount) {
+                    showAlert('Please connect your wallet first', 'error');
+                    return;
+                }
+
+                document.getElementById('marketplaceLoading').style.display = 'block';
+                
+                const listings = await contract.methods.getListings().call();
+                
+                const listingsGrid = document.getElementById('listingsGrid');
+                listingsGrid.innerHTML = '';
+
+                if (listings.length === 0) {
+                    listingsGrid.innerHTML = '<div class="no-data">No active energy listings available</div>';
+                } else {
+                    listings.forEach(listing => {
+                        const listingCard = createListingCard(listing);
+                        listingsGrid.appendChild(listingCard);
+                    });
+                }
+
+                document.getElementById('marketplaceLoading').style.display = 'none';
+
+            } catch (error) {
+                document.getElementById('marketplaceLoading').style.display = 'none';
+                console.error('Error loading listings:', error);
+                showAlert('Failed to load listings: ' + error.message, 'error');
+            }
+        }
+
+        // Create listing card
+        function createListingCard(listing) {
+            const card = document.createElement('div');
+            card.className = 'listing-card';
+            
+            const amount = parseFloat(web3.utils.fromWei(listing.amount, 'ether')).toFixed(2);
+            const price = parseFloat(web3.utils.fromWei(listing.pricePerKWh, 'ether')).toFixed(6);
+            const totalCost = (amount * price).toFixed(6);
+            const date = new Date(listing.timestamp * 1000).toLocaleString();
+
+            card.innerHTML = `
+                <div class="listing-header">
+                    <div class="listing-id">ID: ${listing.id}</div>
+                    <div class="listing-producer">${listing.producerName}</div>
+                </div>
+                <div class="listing-details">
+                    <div class="detail-row">
+                        <span class="detail-label">Amount Available</span>
+                        <span class="detail-value">${amount} kWh</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Price per kWh</span>
+                        <span class="detail-value">${price} ETH</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Total Cost</span>
+                        <span class="detail-value">${totalCost} ETH</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Listed On</span>
+                        <span class="detail-value">${date}</span>
+                    </div>
+                </div>
+                <div class="purchase-section">
+                    <div class="form-group">
+                        <label>Amount to Purchase (kWh):</label>
+                        <input type="number" class="purchase-amount" placeholder="Enter amount" step="0.01" max="${amount}">
+                    </div>
+                    <button class="btn" onclick="buyEnergy(${listing.id}, this.parentElement.querySelector('.purchase-amount').value)">
+                        🛒 Purchase Energy
+                    </button>
+                </div>
+            `;
+
+            return card;
+        }
+
+        // Buy energy function
+        async function buyEnergy(listingId, desiredAmount) {
+            try {
+                if (!userAccount) {
+                    showAlert('Please connect your wallet first', 'error');
+                    return;
+                }
+
+                if (!isUserRegistered) {
+                    showAlert('Please register first', 'error');
+                    return;
+                }
+
+                const amount = parseFloat(desiredAmount);
+                if (!amount || amount <= 0) {
+                    showAlert('Please enter a valid amount', 'error');
+                    return;
+                }
+
+                showLoading('Calculating cost...');
+
+                const amountWei = web3.utils.toWei(amount.toString(), 'ether');
+                const totalCost = await contract.methods.calculateCost(listingId, amountWei).call();
+
+                hideLoading();
+                showLoading('Processing purchase...');
+
+                await contract.methods.buyEnergy(listingId, amountWei).send({
+                    from: userAccount,
+                    value: totalCost
+                });
+
+                hideLoading();
+                showAlert('Energy purchased successfully!', 'success');
+                
+                await updateUserInfo();
+                await updateWalletBalance();
+                await loadListings();
+
+            } catch (error) {
+                hideLoading();
+                console.error('Error buying energy:', error);
+                showAlert('Purchase failed: ' + error.message, 'error');
+            }
+        }
+
+        // Sell energy function
+        async function sellEnergy() {
+            try {
+                if (!userAccount) {
+                    showAlert('Please connect your wallet first', 'error');
+                    return;
+                }
+
+                if (!isUserRegistered) {
+                    showAlert('Please register as a producer first', 'error');
+                    return;
+                }
+
+                const amount = parseFloat(document.getElementById('sellAmount').value);
+                const price = parseFloat(document.getElementById('sellPrice').value);
+
+                if (!amount || amount <= 0) {
+                    showAlert('Please enter a valid amount', 'error');
+                    return;
+                }
+
+                if (!price || price <= 0) {
+                    showAlert('Please enter a valid price', 'error');
+                    return;
+                }
+
+                showLoading('Listing energy for sale...');
+
+                const amountWei = web3.utils.toWei(amount.toString(), 'ether');
+                const priceWei = web3.utils.toWei(price.toString(), 'ether');
+
+                await contract.methods.sellEnergy(amountWei, priceWei).send({
+                    from: userAccount
+                });
+
+                hideLoading();
+                showAlert('Energy listed for sale successfully!', 'success');
+                
+                // Clear form
+                document.getElementById('sellAmount').value = '';
+                document.getElementById('sellPrice').value = '';
+                
+                await updateUserInfo();
+                await updateWalletBalance();
+
+            } catch (error) {
+                hideLoading();
+                console.error('Error selling energy:', error);
+                showAlert('Failed to list energy: ' + error.message, 'error');
+            }
+        }
+
+        // Load transaction history with proper error handling
+        async function loadTransactionHistory() {
+            try {
+                if (!userAccount) {
+                    showAlert('Please connect your wallet first', 'error');
+                    return;
+                }
+
+                document.getElementById('historyLoading').style.display = 'block';
+                
+                // Get transaction history from contract
+                const transactions = await contract.methods.getTransactionHistory(userAccount).call();
+                
+                const transactionList = document.getElementById('transactionList');
+                transactionList.innerHTML = '';
+
+                if (transactions.length === 0) {
+                    transactionList.innerHTML = '<div class="no-data">No transaction history found</div>';
+                } else {
+                    // Create a copy of the array to avoid read-only issues
+                    const transactionsCopy = [...transactions];
+                    
+                    // Sort by timestamp (newest first)
+                    transactionsCopy.sort((a, b) => b.timestamp - a.timestamp);
+                    
+                    transactionsCopy.forEach(transaction => {
+                        const transactionItem = createTransactionItem(transaction);
+                        transactionList.appendChild(transactionItem);
+                    });
+                }
+
+                document.getElementById('historyLoading').style.display = 'none';
+
+            } catch (error) {
+                document.getElementById('historyLoading').style.display = 'none';
+                console.error('Error loading transaction history:', error);
+                showAlert('Failed to load transaction history: ' + error.message, 'error');
+            }
+        }
+
+        // Create transaction item
+        function createTransactionItem(transaction) {
+            const item = document.createElement('div');
+            item.className = 'transaction-item';
+            
+            const amount = parseFloat(web3.utils.fromWei(transaction.amount.toString(), 'ether')).toFixed(2);
+            const price = parseFloat(web3.utils.fromWei(transaction.pricePerKWh.toString(), 'ether')).toFixed(6);
+            const totalCost = parseFloat(web3.utils.fromWei(transaction.totalCost.toString(), 'ether')).toFixed(6);
+            const date = new Date(transaction.timestamp * 1000).toLocaleString();
+            
+            const isBuy = transaction.transactionType === 'BUY';
+            const typeClass = isBuy ? 'buy' : 'sell';
+            const typeIcon = isBuy ? '🛒' : '💰';
+            
+            item.innerHTML = `
+                <div class="transaction-header">
+                    <div class="transaction-type ${typeClass}">${typeIcon} ${transaction.transactionType}</div>
+                    <div style="color: #888; font-size: 0.9em;">${date}</div>
+                </div>
+                <div class="listing-details">
+                    <div class="detail-row">
+                        <span class="detail-label">Listing ID</span>
+                        <span class="detail-value">#${transaction.listingId}</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Amount</span>
+                        <span class="detail-value">${amount} kWh</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Price per kWh</span>
+                        <span class="detail-value">${price} ETH</span>
+                    </div>
+                    ${isBuy ? `
+                    <div class="detail-row">
+                        <span class="detail-label">Total Cost</span>
+                        <span class="detail-value">${totalCost} ETH</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Producer</span>
+                        <span class="detail-value">${transaction.producerName}</span>
+                    </div>
+                    ` : `
+                    <div class="detail-row">
+                        <span class="detail-label">Consumer</span>
+                        <span class="detail-value">${transaction.consumerName || 'Not purchased yet'}</span>
+                    </div>
+                    `}
+                </div>
+            `;
+
+            return item;
+        }
+
+        // Withdraw funds function
+        async function withdrawFunds() {
+            try {
+                if (!userAccount) {
+                    showAlert('Please connect your wallet first', 'error');
+                    return;
+                }
+
+                if (!isUserRegistered) {
+                    showAlert('Please register first', 'error');
+                    return;
+                }
+
+                showLoading('Processing withdrawal...');
+
+                await contract.methods.withdrawFunds().send({
+                    from: userAccount
+                });
+
+                hideLoading();
+                showAlert('Funds withdrawn successfully!', 'success');
+                
+                await updateUserInfo();
+                await updateWalletBalance();
+
+            } catch (error) {
+                hideLoading();
+                console.error('Error withdrawing funds:', error);
+                showAlert('Withdrawal failed: ' + error.message, 'error');
+            }
+        }
+
+        // Tab management
+        function setupTabs() {
+            const tabs = document.querySelectorAll('.tab');
+            tabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    const tabName = tab.dataset.tab;
+                    switchTab(tabName);
+                });
+            });
+        }
+
+        function switchTab(tabName) {
+            // Remove active class from all tabs and content
+            document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+            
+            // Add active class to selected tab and content
+            document.querySelector(`[data-tab="${tabName}"]`).classList.add('active');
+            document.getElementById(tabName).classList.add('active');
+            
+            // Load data when switching to certain tabs
+            if (tabName === 'marketplace') {
+                loadListings();
+            } else if (tabName === 'history') {
+                loadTransactionHistory();
+            } else if (tabName === 'wallet') {
+                updateWalletBalance();
+            }
+        }
+
+        // Utility functions
+        function showAlert(message, type) {
+            const alertsContainer = document.getElementById('alerts');
+            const alert = document.createElement('div');
+            alert.className = `alert alert-${type}`;
+            alert.textContent = message;
+            
+            alertsContainer.appendChild(alert);
+            
+            // Auto remove after 5 seconds
+            setTimeout(() => {
+                if (alert.parentNode) {
+                    alert.parentNode.removeChild(alert);
+                }
+            }, 5000);
+        }
+
+        function showLoading(message) {
+            const loadingDiv = document.createElement('div');
+            loadingDiv.id = 'globalLoading';
+            loadingDiv.className = 'loading';
+            loadingDiv.style.display = 'block';
+            loadingDiv.style.position = 'fixed';
+            loadingDiv.style.top = '50%';
+            loadingDiv.style.left = '50%';
+            loadingDiv.style.transform = 'translate(-50%, -50%)';
+            loadingDiv.style.background = 'rgba(15, 15, 25, 0.95)';
+            loadingDiv.style.padding = '40px';
+            loadingDiv.style.borderRadius = '20px';
+            loadingDiv.style.border = '1px solid rgba(0, 191, 255, 0.3)';
+            loadingDiv.style.zIndex = '1000';
+            loadingDiv.innerHTML = `
+                <div class="spinner"></div>
+                <p style="color: #00bfff; font-weight: 600;">${message}</p>
+            `;
+            
+            document.body.appendChild(loadingDiv);
+        }
+
+        function hideLoading() {
+            const loadingDiv = document.getElementById('globalLoading');
+            if (loadingDiv) {
+                loadingDiv.remove();
+            }
+        }
+
+        // Event listener for connect wallet button
+        document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('connectWallet').addEventListener('click', connectWallet);
+        });
+
+        // Auto-refresh data every 30 seconds when wallet is connected
+        setInterval(async () => {
+            if (userAccount) {
+                await updateUserInfo();
+                await updateWalletBalance();
+            }
+        }, 30000);
+    </script>
 </body>
 </html>
