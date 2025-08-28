@@ -3,7 +3,7 @@
 &nbsp;
 
 ## 🖼️ Screenshot
-()
+![ShaktiExchange Dashboard](assets/dashboard.png)
 
 ## 🚀 Deployment 
 
