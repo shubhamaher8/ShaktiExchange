@@ -1,6 +1,15 @@
 # ⚡ ShaktiExchange: Peer-to-Peer Energy Trading Platform ⚡
 
-![ShaktiExchange Banner](https://i.imgur.com/placeholder-replace-with-actual-banner.png)
+&nbsp;
+
+## 🖼️ Screenshot
+()
+
+## 🚀 Deployment 
+
+[![Deployed on Vercel](https://img.shields.io/badge/Deployed%20on-Vercel-black?style=for-the-badge&logo=vercel)](shakti-exchange.vercel.app/)
+
+[![Live Project](https://img.shields.io/badge/Live%20Project-shakti--exchange.vercel.app-green?style=for-the-badge&logo=vercel)](shakti-exchange.vercel.app/)
 
 ## 🌟 Overview
 
@@ -13,10 +22,6 @@ ShaktiExchange is a revolutionary platform enabling peer-to-peer energy trading,
 - 💰 **Smart Pricing**: Algorithm-based pricing adjustments based on supply and demand
 - 🔐 **Secure Transactions**: Safe and transparent energy trading using modern web technologies
 - 📱 **Responsive Design**: Seamless experience across desktop and mobile devices
-
-## 🚀 Live Demo
-
-Experience ShaktiExchange in action: [https://shakti-exchange.vercel.app](https://shakti-exchange.vercel.app)
 
 ## 🛠️ Technologies
 
@@ -67,16 +72,3 @@ Contributions are welcome! Feel free to open issues or submit pull requests to h
 
 This project is licensed under the [GNU General Public License v3.0](LICENSE)
 
-## 📬 Contact
-
-Have questions or suggestions? Reach out to us!
-
----
-
-<p align="center">
-  <img src="https://i.imgur.com/placeholder-logo.png" alt="ShaktiExchange Logo" width="150">
-</p>
-
-<p align="center">
-  <b>Energizing communities, one trade at a time</b>
-</p>
