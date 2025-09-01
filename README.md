@@ -34,7 +34,7 @@ ShaktiExchange is a revolutionary platform enabling peer-to-peer energy trading,
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/shubhamaher8/ShaktiExchange.git
+   git clone https://github.com/shubhamaher8/Shakti-Exchange.git
    ```
 
 2. Open `index.html` in your browser to view the landing page
